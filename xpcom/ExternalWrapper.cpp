@@ -21,6 +21,7 @@
 #include "nsNetCID.h"
 #include "nsCOMPtr.h"
 #include "nsMemory.h"
+#include "jsapi.h"
 #include "nsServiceManagerUtils.h"
 #include "nsIPromptService.h"
 #include "nsIDOMWindow.h"
@@ -42,6 +43,7 @@
 #include "ServerMethods.h"
 #include "BrowserChannel.h"
 #include "AllowedConnections.h"
+
 
 #if GECKO_VERSION >= 1900
 #include "nsIClassInfoImpl.h"
@@ -131,8 +133,9 @@ static bool getWindowObject(nsIDOMWindow** win) {
   }
 
 #endif
-
-  if (!(::JS_GetOptions(cx) & JSOPTION_PRIVATE_IS_NSISUPPORTS)) {
+  
+  JS::ContextOptionsRef(cx).setPrivateIsNSISupports(true);
+  if (JS::ContextOptionsRef(cx).privateIsNSISupports() != true) {
     Debug::log(Debug::Error)
         << "getWindowObject: context doesn't have nsISupports" << Debug::flush;
     return false;

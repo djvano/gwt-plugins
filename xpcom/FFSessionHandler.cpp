@@ -118,14 +118,12 @@ FFSessionHandler::FFSessionHandler(HostChannel* channel)
 
 void FFSessionHandler::getStringObjectClass(JSContext* ctx) {
   jsval str = JS_GetEmptyStringValue(ctx);
-  JSObject* obj = 0;
-  if (!JS_ValueToObject(ctx, str, &obj)) {
-    return;
-  }
+  JSObject* obj = JSVAL_TO_OBJECT(str);
+
   if (!obj) {
     return;
   }
-  stringObjectClass = JS_GET_CLASS(ctx, obj);
+  stringObjectClass = JS_GetClass(obj);
 }
 
 void FFSessionHandler::getToStringTearOff(JSContext* ctx) {
@@ -151,7 +149,8 @@ void FFSessionHandler::getToStringTearOff(JSContext* ctx) {
   };
   if (!JS_CallFunctionValue(ctx, global, funcVal, 3, jsargs, &toStringTearOff)) {
     jsval exc;
-    if (JS_GetPendingException(ctx, &exc)) {
+    JS::MutableHandleValue argHandle = JS::MutableHandleValue::fromMarkedLocation(&exc);
+    if (JS_GetPendingException(ctx, argHandle)) {
       Debug::log(Debug::Error)
           << "__gwt_makeTearOff(null,0,0) threw exception "
           << dumpJsVal(ctx, exc) << Debug::flush;
@@ -168,9 +167,9 @@ FFSessionHandler::~FFSessionHandler(void) {
       << this << ")" << Debug::flush;
   disconnect();
   if (runtime) {
-    JS_RemoveRootRT(runtime, &jsObjectsById);
+    //JS_RemoveRootRT(runtime, &jsObjectsById);
     jsObjectsById = NULL;
-    JS_RemoveRootRT(runtime, &toStringTearOff);
+    //JS_RemoveRootRT(runtime, &toStringTearOff);
     runtime = NULL;
   }
 }
@@ -345,7 +344,8 @@ bool FFSessionHandler::invoke(HostChannel& channel, const gwt::Value& thisObj, c
       numArgs, jsargs.get(), &rval);
 
   if (!ok) {
-    if (JS_GetPendingException(ctx, &rval)) {
+    JS::MutableHandleValue argHandle = JS::MutableHandleValue::fromMarkedLocation(&rval);
+    if (JS_GetPendingException(ctx, argHandle)) {
       makeValueFromJsval(*returnValue, ctx, rval);
       Debug::log(Debug::Debugging) << "FFSessionHandler::invoke "
           << thisObj.toString() << "::" << methodName << " threw exception "
@@ -534,7 +534,8 @@ void FFSessionHandler::makeValueFromJsval(gwt::Value& retVal, JSContext* ctx,
       retVal.setJavaObject(JavaObject::getObjectId(ctx, obj));
     } else if (JS_GET_CLASS(ctx, obj) == stringObjectClass) {
       // JS String wrapper object, treat as a string primitive
-      JSString* str = JS_ValueToString(ctx, value);
+      //JSString* str = JS_ValueToString(ctx, value);
+      JSString* str = JSVAL_TO_STRING(value);
 #if GECKO_VERSION < 2000
     retVal.setString(utf8String(JS_GetStringChars(str),
         JS_GetStringLength(str)));
@@ -676,7 +677,8 @@ void FFSessionHandler::disconnect() {
     freeCtx = true;
     ctx = JS_NewContext(runtime, 8192);
     if (ctx) {
-      JS_SetOptions(ctx, JSOPTION_VAROBJFIX);
+      //JS_SetOptions(ctx, JSOPTION_VAROBJFIX);
+      JS::ContextOptionsRef(ctx).setVarObjFix(true);
 #ifdef JSVERSION_LATEST
       JS_SetVersion(ctx, JSVERSION_LATEST);
 #endif

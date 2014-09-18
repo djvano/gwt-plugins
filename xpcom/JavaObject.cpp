@@ -534,7 +534,8 @@ JSBool JavaObject::invokeJava(JSContext* ctx, SessionData* data,
   Debug::log(Debug::Spam) << "  result is " << returnValue << Debug::flush;
   data->makeJsvalFromValue(retJsVal, ctx, returnValue);
   if (isException) {
-    JS_SetPendingException(ctx, retJsVal);
+    JS::MutableHandleValue argHandle = JS::MutableHandleValue::fromMarkedLocation(&retJsVal);
+    JS_SetPendingException(ctx, argHandle);
     return false;
   }
 #if GECKO_VERSION >= 26000

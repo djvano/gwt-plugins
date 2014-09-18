@@ -238,9 +238,9 @@ ifeq ($(OS),mac)
 NSPR_DLLFLAGS = -lnss3
 endif
 else
-ifeq ($(BROWSER),ff260)
-GECKO_VERSION   = 26.0.0
-CFLAGS += -DGECKO_VERSION=26000
+ifeq ($(BROWSER),ff280)
+GECKO_VERSION   = 28.0.0
+CFLAGS += -DGECKO_VERSION=28000
 GECKO_DLLFLAGS = -lxpcomglue_s
 ifeq ($(OS),mac)
 NSPR_DLLFLAGS = -lnss3
@@ -300,9 +300,9 @@ FF_HEADER         = $(FF_HEADERDIR)/IOOPHM.h
 INSTALL_RDF       = $(EXTENSION_OUTDIR)/install.rdf
 
 SDK_PATH          = $(PLUGIN_SDKS)/gecko-sdks
-GECKO_SDK         = $(SDK_PATH)/gecko-$(GECKO_VERSION)
-GECKO_PLAT_INC    = $(GECKO_SDK)/$(GECKO_PLATFORM)/include
-GECKO_LIBS        = $(GECKO_SDK)/$(GECKO_PLATFORM)/lib$(GECKO_MINOR_VERSION)
+GECKO_SDK         = /softwares/xulrunner-sdk
+GECKO_PLAT_INC    = $(GECKO_SDK)/include
+GECKO_LIBS        = $(GECKO_SDK)/lib
 
 ifeq ($(XPIDL_TOOL),python)
 XPIDL             = $(GECKO_SDK)/bin/xpidl.py
@@ -322,7 +322,7 @@ DLLFLAGS += \
 		$(GECKO_DLLFLAGS) $(NSPR_DLLFLAGS) \
 		$(MOZALLOC_DLLFLAGS) $(MOZJS_DLLFLAGS)
 
-INC += -I$(GECKO_PLAT_INC) -I$(GECKO_SDK)/include -I$(dir $(FF_HEADER))
+INC += -I$(GECKO_PLAT_INC) -I$(GECKO_SDK)/include -I$(GECKO_SDK)/include/nspr -I$(dir $(FF_HEADER))
 
 VERSION ?= unset
 ifeq ($(VERSION), unset)
