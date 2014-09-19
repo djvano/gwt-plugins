@@ -1,28 +1,13 @@
-You will need to checkout the SDKs required for building the plugin
+You will need to download corresponding SDK required for building the plugin
 separately.  These are located at:
-	https://google-web-toolkit.googlecode.com/svn/plugin-sdks
+	http://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/28.0/sdk/ (for Firefox version 28.0)
 
-This assumes the SDKS are located in ../../../plugin-sdks -- if this is
-not correct, edit the definition in Makefile or pass PLUGIN_SDKS=<path> on the
-make command.
+- xulrunner-28.0.en-US.linux-i686.sdk.tar.bz2 for building i686
+- xulrunner-28.0.en-US.linux-x86_64.sdk.tar.bz2
 
 Build by:
 
-make ARCH=x86 BROWSER=ff35
-make ARCH=x86_64 BROWSER=ff3
+~/git/gwt-plugins/xpcom/export BROWSER=ff280 && export VERSION=1.28 && export ARCH=x86 && make clean all
 
-etc -- default is current architecture and ff3.
+~/git/gwt-plugins/xpcom/export BROWSER=ff280 && export VERSION=1.28 && export ARCH=x86_64 && make clean all
 
-BROWSER values supported:
-  ff3	Firefox 3.0
-  ff3+  Firefox 3.0.11+ on some platforms
-  ff35  Firefox 3.5
-  ff36  Firefox 3.6
-  ff40  Firefox 4.0 (and 3.7alpha)
-
-You may need to try both ff3 and ff3+, as different platforms chose different
-library layouts.
-
-Targets of interest:
-  make linuxplatforms
-  make macplatforms
